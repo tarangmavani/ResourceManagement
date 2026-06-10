@@ -90,7 +90,7 @@ The connection string is in `src/ResourceManagement.API/appsettings.json`:
 
 ## 🔐 Authentication
 
-The API uses **JWT Bearer authentication**. Configure the JWT settings in `appsettings.json`:
+The API uses **JWT Bearer authentication** and role-based authorization. Configure the JWT settings in `appsettings.json`:
 
 ```json
 {
@@ -103,10 +103,28 @@ The API uses **JWT Bearer authentication**. Configure the JWT settings in `appse
 }
 ```
 
-Include the token in requests:
-```
-Authorization: Bearer {your-jwt-token}
-```
+### Mock User Credentials
+
+For testing and verification, the following hardcoded users are available:
+
+| Username | Password | Role | Permissions |
+| :--- | :--- | :--- | :--- |
+| `admin` | `Admin@123` | `Admin` | Full access (GET, POST, PUT, DELETE) |
+| `user` | `User@123` | `User` | Read-only access (GET only) |
+
+### How to Authenticate
+1. Call `POST /api/v1/auth/token` with the JSON payload:
+   ```json
+   {
+     "username": "admin",
+     "password": "Admin@123"
+   }
+   ```
+2. Copy the token string returned under `data.token`.
+3. In Swagger UI or your HTTP client, include the token in the `Authorization` header:
+   ```
+   Authorization: Bearer {your-copied-jwt-token}
+   ```
 
 ---
 
@@ -114,15 +132,21 @@ Authorization: Bearer {your-jwt-token}
 
 Base URL: `/api/v1`
 
+### Authentication
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| POST | `/api/v1/auth/token` | Generate JWT token | No |
+
 ### Products
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/v1/products` | List all (paged, filtered, sorted) |
-| GET | `/api/v1/products/{id}` | Get by ID |
-| POST | `/api/v1/products` | Create product |
-| PUT | `/api/v1/products/{id}` | Update product |
-| DELETE | `/api/v1/products/{id}` | Delete product |
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| GET | `/api/v1/products` | List all (paged, filtered, sorted) | Yes (Admin, User) |
+| GET | `/api/v1/products/{id}` | Get by ID | Yes (Admin, User) |
+| POST | `/api/v1/products` | Create product | Yes (Admin only) |
+| PUT | `/api/v1/products/{id}` | Update product | Yes (Admin only) |
+| DELETE | `/api/v1/products/{id}` | Delete product | Yes (Admin only) |
 
 **Query Parameters (GET /products):**
 - `filter` — filter by product name
@@ -133,13 +157,13 @@ Base URL: `/api/v1`
 
 ### Items
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/v1/items/by-product/{productId}` | Get items by product |
-| GET | `/api/v1/items/{id}` | Get item by ID |
-| POST | `/api/v1/items` | Create item |
-| PUT | `/api/v1/items/{id}` | Update item |
-| DELETE | `/api/v1/items/{id}` | Delete item |
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| GET | `/api/v1/items/by-product/{productId}` | Get items by product | Yes (Admin, User) |
+| GET | `/api/v1/items/{id}` | Get item by ID | Yes (Admin, User) |
+| POST | `/api/v1/items` | Create item | Yes (Admin only) |
+| PUT | `/api/v1/items/{id}` | Update item | Yes (Admin only) |
+| DELETE | `/api/v1/items/{id}` | Delete item | Yes (Admin only) |
 
 ### Standardized Response Format
 
@@ -166,6 +190,7 @@ Tests cover:
 - ✅ ProductRepository (6 tests — in-memory EF)
 - ✅ ProductsController (8 tests)
 - ✅ ItemsController (9 tests)
+- ✅ AuthController (3 tests)
 
 ---
 

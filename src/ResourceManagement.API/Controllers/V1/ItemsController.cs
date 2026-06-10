@@ -1,10 +1,12 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ResourceManagement.Application.DTOs;
 using ResourceManagement.Application.Services;
 
 namespace ResourceManagement.API.Controllers.V1;
 
+[Authorize]
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
@@ -51,6 +53,7 @@ public class ItemsController : ControllerBase
 
     /// <summary>Create a new item.</summary>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<ItemDto>), 201)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
@@ -69,6 +72,7 @@ public class ItemsController : ControllerBase
 
     /// <summary>Update an item.</summary>
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<ItemDto>), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
@@ -87,6 +91,7 @@ public class ItemsController : ControllerBase
 
     /// <summary>Delete an item.</summary>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<object>), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(int id)
