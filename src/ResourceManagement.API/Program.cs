@@ -177,9 +177,6 @@ finally
 // Needed for MVC Testing
 public partial class Program { }
 
-// ────────────────
-// Configures a Swagger document per discovered API version
-// ────────────────
 public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 {
     private readonly IApiVersionDescriptionProvider _provider;
